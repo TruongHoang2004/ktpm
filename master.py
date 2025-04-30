@@ -2,9 +2,12 @@ import requests
 import redis
 import json
 import time
+from dotenv import load_dotenv
+import os
 
 GITHUB_API_URL = "https://api.github.com/search/repositories"
-GITHUB_TOKEN = "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"
+load_dotenv()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REDIS_HOST = "localhost"
 
 def get_top_repos():

@@ -1,9 +1,16 @@
 import redis
 import requests
 import json
+from dotenv import load_dotenv
+import os
 
-# Token GitHub gán trực tiếp
-GITHUB_TOKEN = "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"
+# Load environment variables from .env file
+load_dotenv()
+
+# Get GitHub token from environment variable
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+if not GITHUB_TOKEN:
+    raise ValueError("GitHub token not found. Please set GITHUB_TOKEN in your .env file.")
 
 # Cấu hình GitHub API & Redis
 REDIS_HOST = "localhost"
@@ -66,7 +73,7 @@ def worker():
                 })
             result["releases"].append(release_data)
 
-            
+
 
         # Hiển thị kết quả
         print(json.dumps(result, indent=2))
