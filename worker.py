@@ -1,26 +1,11 @@
 import redis
 import requests
 import json
-from dotenv import load_dotenv
-import os
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Get GitHub token from environment variable
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-if not GITHUB_TOKEN:
-    raise ValueError("GitHub token not found. Please set GITHUB_TOKEN in your .env file.")
+from api_client import create_api_client, make_request
 
 # Cấu hình GitHub API & Redis
 REDIS_HOST = "localhost"
 GITHUB_API_URL = "https://api.github.com/repos"
-
-HEADERS = {
-    "Authorization": f"Bearer {GITHUB_TOKEN}",
-    "Accept": "application/vnd.github+json",
-    "User-Agent": "github-crawler"
-}
 
 def get_repo_from_queue():
     r = redis.Redis(host=REDIS_HOST, port=6379, db=0)
@@ -31,17 +16,19 @@ def get_repo_from_queue():
 
 def get_releases(repo):
     releases_url = f"{GITHUB_API_URL}/{repo}/releases"
-    response = requests.get(releases_url, headers=HEADERS)
-    if response.status_code == 200:
+    headers = create_api_client()
+    response = make_request(releases_url, headers)
+    if response and response.status_code == 200:
         return response.json()
-    elif response.status_code == 403:
+    elif response and response.status_code == 403:
         print("❌ Bị giới hạn bởi GitHub API (403).")
     return []
 
 def get_commits(repo, release_tag):
     commits_url = f"{GITHUB_API_URL}/{repo}/commits?sha={release_tag}"
-    response = requests.get(commits_url, headers=HEADERS)
-    if response.status_code == 200:
+    headers = create_api_client()
+    response = make_request(commits_url, headers)
+    if response and response.status_code == 200:
         return response.json()
     return []
 
@@ -72,8 +59,6 @@ def worker():
                     "message": commit.get("commit", {}).get("message", "")
                 })
             result["releases"].append(release_data)
-
-
 
         # Hiển thị kết quả
         print(json.dumps(result, indent=2))
