@@ -1,26 +1,11 @@
 import redis
 import requests
 import json
-from dotenv import load_dotenv
-import os
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Get GitHub token from environment variable
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-if not GITHUB_TOKEN:
-    raise ValueError("GitHub token not found. Please set GITHUB_TOKEN in your .env file.")
+from api_client import create_api_client, make_request
 
 # Cấu hình GitHub API & Redis
 REDIS_HOST = "localhost"
 GITHUB_API_URL = "https://api.github.com/repos"
-
-HEADERS = {
-    "Authorization": f"Bearer {GITHUB_TOKEN}",
-    "Accept": "application/vnd.github+json",
-    "User-Agent": "github-crawler"
-}
 
 def get_repo_from_queue():
     r = redis.Redis(host=REDIS_HOST, port=6379, db=0)
@@ -30,6 +15,7 @@ def get_repo_from_queue():
     return None
 
 def get_releases(repo):
+<<<<<<< HEAD
     releases = []
     page = 1
     per_page = 100  # GitHub cho phép tối đa 100 item mỗi trang
@@ -37,6 +23,24 @@ def get_releases(repo):
     while True:
         url = f"{GITHUB_API_URL}/{repo}/releases?page={page}&per_page={per_page}"
         response = requests.get(url, headers=HEADERS)
+=======
+    releases_url = f"{GITHUB_API_URL}/{repo}/releases"
+    headers = create_api_client()
+    response = make_request(releases_url, headers)
+    if response and response.status_code == 200:
+        return response.json()
+    elif response and response.status_code == 403:
+        print("❌ Bị giới hạn bởi GitHub API (403).")
+    return []
+
+def get_commits(repo, release_tag):
+    commits_url = f"{GITHUB_API_URL}/{repo}/commits?sha={release_tag}"
+    headers = create_api_client()
+    response = make_request(commits_url, headers)
+    if response and response.status_code == 200:
+        return response.json()
+    return []
+>>>>>>> eb62b8a9715a275fa448994105287310366e5de1
 
         if response.status_code == 200:
             page_data = response.json()
@@ -124,6 +128,7 @@ def worker(repo):
                 "message": commit.get("commit", {}).get("message", "")
             })
 
+<<<<<<< HEAD
         result["releases"].append(release_data)
 
         # Cập nhật previous_tag cho release tiếp theo
@@ -134,3 +139,14 @@ def worker(repo):
 
 if __name__ == "__main__":
     worker("facebook/react")  # Thay thế bằng repo bạn muốn xử lý
+=======
+        # Hiển thị kết quả
+        print(json.dumps(result, indent=2))
+        return result
+    else:
+        print("📭 Queue trống.")
+        return None
+
+if __name__ == "__main__":
+    worker()
+>>>>>>> eb62b8a9715a275fa448994105287310366e5de1
