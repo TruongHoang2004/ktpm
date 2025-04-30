@@ -12,6 +12,7 @@ TOKENS = [
     os.getenv("GITHUB_TOKEN_2"),
     os.getenv("GITHUB_TOKEN_3"),
     os.getenv("GITHUB_TOKEN_4"),
+    os.getenv("GITHUB_TOKEN_5"),
 ]
 
 # Kiểm tra và in thông tin chi tiết nếu thiếu token
