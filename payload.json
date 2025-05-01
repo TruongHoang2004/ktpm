@@ -1,0 +1,70 @@
+{
+  "user": "vuejs",
+  "repo": "vue",
+  "releases": [
+    {
+      "id": 12345678,
+      "content": "First release of Vue.js with basic features",
+      "commits": [
+        {
+          "hash": "a1b2c3d4",
+          "message": "Initial commit with core functionality"
+        },
+        {
+          "hash": "b1c2d3e4",
+          "message": "Add basic templating engine"
+        }
+      ]
+    },
+    {
+      "id": 12345679,
+      "content": "Second release with improved reactivity",
+      "commits": [
+        {
+          "hash": "c1d2e3f4",
+          "message": "Improve reactivity system"
+        },
+        {
+          "hash": "d1e2f3g4",
+          "message": "Add support for custom directives"
+        }
+      ]
+    },
+    {
+      "id": 12345680,
+      "content": "Third release with Vue Router integration",
+      "commits": [
+        {
+          "hash": "e1f2g3h4",
+          "message": "Add Vue Router for client-side routing"
+        },
+        {
+          "hash": "f1g2h3i4",
+          "message": "Fix bug with route transitions"
+        },
+        {
+          "hash": "g1h2i3j4",
+          "message": "Improve handling of nested routes"
+        }
+      ]
+    },
+    {
+      "id": 12345681,
+      "content": "Fourth release with Vuex state management",
+      "commits": [
+        {
+          "hash": "h1i2j3k4",
+          "message": "Add Vuex for centralized state management"
+        },
+        {
+          "hash": "i1j2k3l4",
+          "message": "Fix issues with store mutations"
+        },
+        {
+          "hash": "j1k2l3m4",
+          "message": "Improve performance of state updates"
+        }
+      ]
+    }
+  ]
+}
