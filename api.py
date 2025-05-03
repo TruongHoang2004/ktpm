@@ -7,7 +7,7 @@ DB_HOST = "localhost"
 DB_PORT = "5432"
 DB_NAME = "github_crawler"
 DB_USER = "postgres"
-DB_PASSWORD = "huy123456789"
+DB_PASSWORD = "truonghoang2004"
 
 def get_conn():
     return psycopg2.connect(
@@ -25,8 +25,9 @@ def save_data(payload):
     user = payload["user"]
     repo_name = payload["repo"]
 
+    # Tạo hoặc lấy repository
     cur.execute("""
-        INSERT INTO repo ("user", name)
+        INSERT INTO repositories ("user", name)
         VALUES (%s, %s)
         ON CONFLICT ("user", name) DO NOTHING
         RETURNING id
@@ -37,34 +38,42 @@ def save_data(payload):
         repo_id = repo_row[0]
     else:
         cur.execute("""
-            SELECT id FROM repo
+            SELECT id FROM repositories
             WHERE "user" = %s AND name = %s
         """, (user, repo_name))
         repo_id = cur.fetchone()[0]
 
     for rel in payload.get("releases", []):
-        release_id = rel["id"]
-        content = rel["content"]
+        tag = rel.get("tag_name", "")
+        name = rel.get("release_name", "")
+        created_at = rel.get("created_at", "")
+        content = f"{name} | {tag} | {created_at}"
 
+        # Thêm release mới
         cur.execute("""
-            INSERT INTO "release" (id, content, repoID)
-            VALUES (%s, %s, %s)
-            ON CONFLICT (id) DO UPDATE SET
-                content = EXCLUDED.content,
-                repoID = EXCLUDED.repoID
-        """, (release_id, content, repo_id))
+            INSERT INTO releases (content, repoID)
+            VALUES (%s, %s)
+            RETURNING id
+        """, (content, repo_id))
+        release_id = cur.fetchone()[0]
 
-        for cm in rel.get("commits", []):
+        # Thêm commits nếu có
+        commits_data = rel.get("commits", {}).get("commits", [])
+        for cm in commits_data:
+            hash_val = cm["sha"]
+            message = cm["message"]
+
             cur.execute("""
                 INSERT INTO commits (hash, message, releaseID)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (hash, releaseID) DO UPDATE SET
                     message = EXCLUDED.message
-            """, (cm["hash"], cm["message"], release_id))
+            """, (hash_val, message, release_id))
 
     conn.commit()
     cur.close()
     conn.close()
+
 
 @app.route("/save_data", methods=["POST"])
 def save_data_route():

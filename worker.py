@@ -1,5 +1,6 @@
 import redis
 from api_client import GitHubAPIClient
+from api import save_data  # Giả sử bạn có một hàm lưu dữ liệu vào DB
 
 # Cấu hình GitHub API & Redis
 REDIS_HOST = "localhost"
@@ -20,7 +21,7 @@ def get_commits_between_tags(repo, tag1, tag2):
     per_page = 250
     all_commits = []
 
-    print(f"🔍 So sánh commits từ {tag1} đến {tag2}")
+    # print(f"🔍 So sánh commits từ {tag1} đến {tag2}")
 
     while True:
         url = f"{GITHUB_API_URL}/{repo}/compare/{tag1}...{tag2}?page={page}&per_page={per_page}"
@@ -78,7 +79,8 @@ def worker(repo):
     print(f"Số lượng releases được tìm thấy: {len(releases)}")
 
     result = {
-        "repo": repo,
+        "user": repo.split("/")[0],
+        "repo": repo.split("/")[1],
         "releases": []
     }
 
@@ -123,7 +125,9 @@ def worker(repo):
             }
 
     print(f"✅ Hoàn thành: {repo} — {len(result['releases'])} releases được xử lý.")
-    return result
+
+    save_data(result)  # Gọi hàm lưu dữ liệu vào DB
+    
 
 if __name__ == "__main__":
     worker("facebook/react")  # Thay repo ở đây nếu cần

@@ -49,7 +49,7 @@ def fetch_top_repos():
 
     return list(repos)
 
-if __name__ == "__main__":
+def master():
     r = redis.Redis(host=REDIS_HOST, port=6379, db=0)
     r.delete("github_repos")
     print("🧹 Đã xóa Redis queue 'github_repos'.")
@@ -57,3 +57,6 @@ if __name__ == "__main__":
     print("🚀 Bắt đầu lấy 5000 repo GitHub nhiều sao nhất (không lọc ngôn ngữ)...")
     fetched_repos = fetch_top_repos()
     print(f"✅ Hoàn tất. Tổng số repo đã lấy: {len(fetched_repos)}")
+
+if __name__ == "__main__":
+    master()

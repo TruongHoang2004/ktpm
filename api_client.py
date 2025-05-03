@@ -22,6 +22,8 @@ class GitHubAPIClient:
             os.getenv("GITHUB_TOKEN_3"),
             os.getenv("GITHUB_TOKEN_4"),
             os.getenv("GITHUB_TOKEN_5"),
+            os.getenv("GITHUB_TOKEN_6"),
+            os.getenv("GITHUB_TOKEN_7"),
         ]
 
         missing_tokens = [f"GITHUB_TOKEN_{i+1}" for i, token in enumerate(self.tokens) if not token]
