@@ -6,7 +6,7 @@ from worker import worker  # import hàm xử lý từ worker.py
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
 REDIS_DB = 0
-MAX_WORKERS = 20
+MAX_WORKERS = 100
 WAIT_TIME_IF_EMPTY = 10  # thời gian chờ khi Redis trống
 
 def count_pending_repos():
@@ -36,6 +36,8 @@ def run_workers_with_loop():
     print(f"🚀 Khởi chạy tối đa {MAX_WORKERS} worker(s).")
     with Pool(processes=MAX_WORKERS) as pool:
         pool.map(continuous_worker_loop, range(MAX_WORKERS))
+    print("🎉 Tất cả worker đã hoàn thành và chương trình đã kết thúc.")
+
 
 if __name__ == "__main__":
     run_workers_with_loop()
