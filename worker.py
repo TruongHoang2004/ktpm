@@ -21,7 +21,7 @@ def get_commits_between_tags(repo, tag1, tag2):
     per_page = 250
     all_commits = []
 
-    # print(f"🔍 So sánh commits từ {tag1} đến {tag2}")
+    print(f"🔍 So sánh commits từ {tag1} đến {tag2}")
 
     while True:
         url = f"{GITHUB_API_URL}/{repo}/compare/{tag1}...{tag2}?page={page}&per_page={per_page}"
@@ -127,7 +127,6 @@ def worker(repo):
     print(f"✅ Hoàn thành: {repo} — {len(result['releases'])} releases được xử lý.")
 
     save_data(result)  # Gọi hàm lưu dữ liệu vào DB
-    
 
 if __name__ == "__main__":
     worker("facebook/react")  # Thay repo ở đây nếu cần

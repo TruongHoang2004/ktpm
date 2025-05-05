@@ -43,10 +43,14 @@ class GitHubAPIClient:
 
     def make_request(self, url):
         retries = 0
+        proxies = {
+            "http": "http://pcjm2Is2mE-res-any:PC_1eqwkDpGtrUwA586o@proxy-us.proxy-cheap.com:5959",
+            "https": "http://pcjm2Is2mE-res-any:PC_1eqwkDpGtrUwA586o@proxy-us.proxy-cheap.com:5959"
+        }
 
         while retries < self.max_retries:
             headers = self._get_headers(self.current_token)
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, proxies=proxies)
 
             if response.status_code == 200:
                 return response

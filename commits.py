@@ -12,11 +12,15 @@ headers = {
 page = 1
 per_page = 250
 all_commits = []
+proxies = {
+    "http": "http://pcjm2Is2mE-res-any:PC_1eqwkDpGtrUwA586o@proxy-us.proxy-cheap.com:5959",
+    "https": "http://pcjm2Is2mE-res-any:PC_1eqwkDpGtrUwA586o@proxy-us.proxy-cheap.com:5959"
+}
 
 while True:
     print(f"Fetching page {page}...")
     url = f"https://api.github.com/repos/facebook/react/compare/v18.3.1...v19.0.0?page={page}&per_page={per_page}"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, proxies=proxies)
     data = response.json()
 
     commits = data.get("commits", [])

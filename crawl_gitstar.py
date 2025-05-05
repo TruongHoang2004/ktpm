@@ -6,6 +6,10 @@ BASE_URL = "https://gitstar-ranking.com/repositories"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
+PROXIES = {
+    "http": "http://pcjm2Is2mE-res-any:PC_1eqwkDpGtrUwA586o@proxy-us.proxy-cheap.com:5959",
+    "https": "http://pcjm2Is2mE-res-any:PC_1eqwkDpGtrUwA586o@proxy-us.proxy-cheap.com:5959"
+}
 
 def extract_repos_from_page(html):
     soup = BeautifulSoup(html, "html.parser")
@@ -17,7 +21,7 @@ def crawl_top_repos(max_pages=50):
     for page in range(1, max_pages + 1):
         print(f"--- Trang {page} ---")
         try:
-            response = requests.get(f"{BASE_URL}?page={page}", headers=HEADERS)
+            response = requests.get(f"{BASE_URL}?page={page}", headers=HEADERS, proxies=PROXIES)
             if response.status_code != 200:
                 print(f"⚠️ Không tải được trang {page} (HTTP {response.status_code})")
                 break
