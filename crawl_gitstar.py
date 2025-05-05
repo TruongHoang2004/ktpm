@@ -1,11 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import redis
 
 BASE_URL = "https://gitstar-ranking.com/repositories"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
+
+# Kết nối Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=0)  # Điều chỉnh nếu cần
 
 def extract_repos_from_page(html):
     soup = BeautifulSoup(html, "html.parser")
@@ -28,6 +32,8 @@ def crawl_top_repos(max_pages=50):
             all_repos.extend(repos)
             for repo in repos:
                 print(repo)
+                # Lưu vào Redis (danh sách hoặc set)
+                redis_client.rpush("github_repos", repo)
             time.sleep(1) 
         except Exception as e:
             print(f"❌ Lỗi tại trang {page}: {e}")
