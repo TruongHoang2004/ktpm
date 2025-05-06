@@ -27,7 +27,6 @@ Phiên bản hiện tại đã cải tiến đáng kể:
 - **Triển khai**:
   - `crawl_gitstar.py` thu thập danh sách 5000 repository từ `gitstar-ranking.com` và đẩy vào Redis queue (`github_repos`).
   - `worker.py` lấy repository từ queue, truy vấn GitHub API để lấy thông tin release và commit, sau đó lưu vào database qua `api.py`.
-- **Vấn đề**: Ban đầu, khi sử dụng GitHub Search API trong `master.py`, crawler chỉ thu thập được 1000 repository do giới hạn API (`422: Only the first 1000 search results are available`).
 
 ### 2. Đánh giá và nêu nguyên nhân của các vấn đề gặp phải
 
@@ -43,8 +42,8 @@ Phiên bản hiện tại đã cải tiến đáng kể:
 - **Vượt qua giới hạn API**:
   - Chuyển sang dùng `gitstar-ranking.com` để lấy danh sách repository, đảm bảo đủ 5000 repository.
 - **Hiệu suất**:
-  - Phiên bản ban đầu: Crawl tuần tự, mất ~2 giờ để xử lý 1000 repository.
-  - Phiên bản hiện tại: Song song hóa với 40 workers, xử lý 5000 repository trong ~1 giờ (ước tính 5000 request × 0.5 giây/request ÷ 40 workers = ~62.5 giây/1000 repository).
+  - Phiên bản ban đầu: Crawl tuần tự, mất ~2 giờ để xử lý 98 repository.
+  - Phiên bản hiện tại: Song song hóa với 40 workers, xử lý 5000 repository trong ~12 giờ.
 - **Xử lý lỗi**:
   - `api_client.py` luân phiên token khi gặp lỗi `401` hoặc `403`, giảm nguy cơ dừng giữa chừng.
   - Retry khi gặp lỗi mạng (`ChunkedEncodingError`, `ConnectionError`, `Timeout`).
@@ -66,7 +65,7 @@ Phiên bản hiện tại đã cải tiến đáng kể:
   - Mỗi worker lấy repository từ Redis queue (`github_repos`) và xử lý độc lập (lấy release, commit, lưu vào database).
 - **Hiệu quả**:
   - Tăng tốc độ xử lý gấp 40 lần so với tuần tự (với 40 workers).
-  - Giảm thời gian từ ~2 giờ (1000 repository, tuần tự) xuống ~1 giờ (5000 repository, song song).
+  - Giảm thời gian từ ~2 giờ (98 repository, tuần tự) xuống ~12 giờ (5000 repository, song song).
 
 ### 6. Giải quyết vấn đề crawler bị chặn khi truy cập quá nhiều
 
