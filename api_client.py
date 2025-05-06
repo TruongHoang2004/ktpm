@@ -1,7 +1,9 @@
 import os
 import requests
+import time
 from itertools import cycle
 from dotenv import load_dotenv
+from requests.exceptions import ChunkedEncodingError, ConnectionError, Timeout, RequestException
 
 # Load environment variables from .env
 load_dotenv()
@@ -16,19 +18,14 @@ class GitHubAPIClient:
         return cls._instance
 
     def _initialize(self):
-        self.tokens = [
-            os.getenv("GITHUB_TOKEN_1"),
-            os.getenv("GITHUB_TOKEN_2"),
-            os.getenv("GITHUB_TOKEN_3"),
-            os.getenv("GITHUB_TOKEN_4"),
-            os.getenv("GITHUB_TOKEN_5"),
-            os.getenv("GITHUB_TOKEN_6"),
-            os.getenv("GITHUB_TOKEN_7"),
-        ]
+        raw_tokens = os.getenv("GITHUB_TOKENS")
+        if not raw_tokens:
+            raise ValueError("Missing GITHUB_TOKENS in .env file")
 
-        missing_tokens = [f"GITHUB_TOKEN_{i+1}" for i, token in enumerate(self.tokens) if not token]
-        if missing_tokens:
-            raise ValueError(f"Missing GitHub tokens in .env file: {', '.join(missing_tokens)}")
+        self.tokens = [token.strip() for token in raw_tokens.split(',') if token.strip()]
+
+        if not self.tokens:
+            raise ValueError("No valid GitHub tokens provided in GITHUB_TOKENS")
 
         self.token_cycle = cycle(self.tokens)
         self.current_token = next(self.token_cycle)
@@ -46,19 +43,31 @@ class GitHubAPIClient:
 
         while retries < self.max_retries:
             headers = self._get_headers(self.current_token)
-            response = requests.get(url, headers=headers)
+            try:
+                response = requests.get(url, headers=headers, timeout=15)
 
-            if response.status_code == 200:
-                return response
+                if response.status_code == 200:
+                    return response
 
-            elif response.status_code in [401, 403]:
-                message = response.json().get("message", "")
-                print(f"⚠️ Token error ({response.status_code}): {message}")
+                elif response.status_code in [401, 403]:
+                    message = response.json().get("message", "")
+                    print(f"⚠️ Token error ({response.status_code}): {message}")
+                    self.current_token = next(self.token_cycle)
+                    retries += 1
+                else:
+                    print(f"❌ Request failed: {response.status_code} — {response.text}")
+                    return None
+
+            except (ChunkedEncodingError, ConnectionError, Timeout) as e:
+                print(f"🔁 Lỗi mạng ({type(e).__name__}): {e}. Đang thử lại với token khác...")
                 self.current_token = next(self.token_cycle)
                 retries += 1
-            else:
-                print(f"❌ Request failed: {response.status_code} — {response.text}")
+                time.sleep(2)
+
+            except RequestException as e:
+                print(f"❌ RequestException nghiêm trọng: {e}")
                 return None
 
-        print("🚫 All tokens exhausted or invalid.")
-        return None
+        print("🚫 Tất cả token đều lỗi hoặc không thể kết nối. Chờ 10 phút rồi thử lại...")
+        time.sleep(600)
+        return self.make_request(url)

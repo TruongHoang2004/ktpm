@@ -1,23 +1,30 @@
+import os
 import psycopg2
+from dotenv import load_dotenv
 
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "github_crawler"
-DB_USER = "postgres"
-DB_PASSWORD = "huy123456789"
+# Load environment variables from .env
+load_dotenv()
+
+# Read DB info from environment
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 create_tables_sql = """
-CREATE TABLE IF NOT EXISTS repo (
+CREATE TABLE IF NOT EXISTS repositories (
     id SERIAL PRIMARY KEY,
     "user" TEXT NOT NULL,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    UNIQUE ("user", name)
 );
 
-CREATE TABLE IF NOT EXISTS release (
-    id BIGINT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS releases (
+    id BIGSERIAL PRIMARY KEY,
     content TEXT NOT NULL,
     repoID INTEGER NOT NULL,
-    FOREIGN KEY (repoID) REFERENES repo(id) ON DELETE CASCADE
+    FOREIGN KEY (repoID) REFERENCES repositories(id)
 );
 
 CREATE TABLE IF NOT EXISTS commits (
@@ -25,7 +32,7 @@ CREATE TABLE IF NOT EXISTS commits (
     message TEXT NOT NULL,
     releaseID BIGINT NOT NULL,
     PRIMARY KEY (hash, releaseID),
-    FOREIGN KEY (releaseID) REFERENCES release(id) ON DELETE CASCADE
+    FOREIGN KEY (releaseID) REFERENCES releases(id)
 );
 """
 

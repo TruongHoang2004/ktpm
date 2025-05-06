@@ -47,7 +47,8 @@ def save_data(payload):
         tag = rel.get("tag_name", "")
         name = rel.get("release_name", "")
         created_at = rel.get("created_at", "")
-        content = f"{name} | {tag} | {created_at}"
+        body = rel.get("body", "")
+        content = f"{name} | {tag} | {created_at} | {body}"
 
         # Thêm release mới
         cur.execute("""
