@@ -4,12 +4,13 @@ import psycopg2
 
 app = Flask(__name__)
 
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_PORT = "5432"
-DB_NAME = "github_crawler"
-DB_USER = "postgres"
-DB_PASSWORD = "truonghoang2004"
+load_dotenv()
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "github_crawler")
+DB_USER = os.getenv("DB_USER", "user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "userpassword")
 
 def get_conn():
     return psycopg2.connect(
