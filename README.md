@@ -152,7 +152,7 @@ Phiên bản hiện tại đã cải tiến đáng kể:
 Sau khi chạy xong, dữ liệu được lưu vào PostgreSQL với kết quả như sau:
 
 - **Repositories**:
-  - Số lượng: 4990 rows
+  - Số lượng: 5000 rows
   - Dung lượng: 752KB
 - **Releases**:
   - Số lượng: 306,941 rows

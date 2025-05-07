@@ -141,4 +141,4 @@ def worker(repo):
         print(f"[{repo}] 🔥 Lỗi trong quá trình xử lý: {e}")
 
 if __name__ == "__main__":
-    worker("eastlakeside/interpy-zh")  # Hoặc bất kỳ repo nào bạn muốn test
+    worker("aaamoon/copilot-gpt4-service")  # Hoặc bất kỳ repo nào bạn muốn test
